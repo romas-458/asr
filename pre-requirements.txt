@@ -1,1 +1,2 @@
-git+https://github.com/NVIDIA/NeMo.git@main#egg=nemo_toolkit[asr]
+nemo_toolkit[asr]
+#git+https://github.com/NVIDIA/NeMo.git@main#egg=nemo_toolkit[asr]
