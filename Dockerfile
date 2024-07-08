@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.8-slim
+FROM python:3.10-slim
 
 # Set the working directory in the container
 WORKDIR /app
@@ -9,9 +9,9 @@ COPY . /app
 
 # Install any needed packages specified in requirements.txt
 RUN apt-get update && \
-    apt-get install -y build-essential
+    apt-get install -y build-essential && apt-get install -y libsndfile1 ffmpeg
 
-RUN pip install --no-cache-dir packages
+#RUN pip install --no-cache-dir packages
 RUN pip install --no-cache-dir numpy
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir -r pre-requirements.txt
