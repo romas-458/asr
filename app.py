@@ -8,6 +8,7 @@ import nemo.collections.asr as nemo_asr
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 import torch
+import tempfile
 import soundfile as sf
 
 
@@ -98,18 +99,13 @@ class TranscriptionResult(BaseModel):
 
 @app.post("/transcribe/", response_model=TranscriptionResult)
 async def transcribe(file: UploadFile = File(...)):
-    # Read the uploaded file
-    audio, sample_rate = sf.read(file.file)
 
-    # Convert audio to the format required by the model
-    if len(audio.shape) > 1:
-        audio = audio.mean(axis=1)  # Convert to mono
-
-    # Convert audio to PyTorch tensor
-    audio_tensor = torch.tensor(audio).unsqueeze(0)
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        temp_file.write(file.file.read())
+        temp_file_path = temp_file.name
 
     # Perform transcription
-    transcription = transcribe_func(audio_tensor)
+    transcription = transcribe_func(temp_file_path)
 
     return TranscriptionResult(transcription=transcription)
 
@@ -118,3 +114,8 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+    # y, sr = librosa.load('common_voice_uk_38506506.mp3')
+
+    # y, sr = librosa.load('common_voice_uk_38506506.mp3', sr=asr_model.cfg["sample_rate"], mono=True, res_type='soxr_hq')
+    # print(y)
